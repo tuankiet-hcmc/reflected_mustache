@@ -54,16 +54,16 @@ class SectionNode extends Node {
         super(start, end);
 
   final String name;
-  final String delimiters;
+  final String? delimiters;
   final bool inverse;
   final int contentStart;
-  int contentEnd; // Set in parser when close tag is parsed.
-  final List<Node> children = <Node>[];
+  int? contentEnd; // Set in parser when close tag is parsed.
+  final List<Node?> children = <Node?>[];
 
   void accept(Visitor visitor) => visitor.visitSection(this);
 
   void visitChildren(Visitor visitor) {
-    children.forEach((node) => node.accept(visitor));
+    children.forEach((node) => node!.accept(visitor));
   }
 
   toString() => '(SectionNode $name inverse: $inverse $start $end)';

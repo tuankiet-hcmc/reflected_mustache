@@ -6,26 +6,26 @@ class TemplateException implements m.TemplateException {
   TemplateException(this.message, this.templateName, this.source, this.offset);
 
   final String message;
-  final String templateName;
-  final String source;
-  final int offset;
+  final String? templateName;
+  final String? source;
+  final int? offset;
 
   bool _isUpdated = false;
-  int _line;
-  int _column;
-  String _context;
+  int? _line;
+  int? _column;
+  String? _context;
 
-  int get line {
+  int? get line {
     _update();
     return _line;
   }
 
-  int get column {
+  int? get column {
     _update();
     return _column;
   }
 
-  String get context {
+  String? get context {
     _update();
     return _context;
   }
@@ -46,14 +46,14 @@ class TemplateException implements m.TemplateException {
 
     if (source == null ||
         offset == null ||
-        (offset < 0 || offset > source.length)) return;
+        (offset! < 0 || offset! > source!.length)) return;
 
     // Find line and character column.
     int lineNum = 1;
     int lineStart = 0;
-    bool lastWasCR;
-    for (int i = 0; i < offset; i++) {
-      int char = source.codeUnitAt(i);
+    late bool lastWasCR;
+    for (int i = 0; i < offset!; i++) {
+      int char = source!.codeUnitAt(i);
       if (char == 0x0a) {
         if (lineStart != i || !lastWasCR) {
           lineNum++;
@@ -68,12 +68,12 @@ class TemplateException implements m.TemplateException {
     }
 
     _line = lineNum;
-    _column = offset - lineStart + 1;
+    _column = offset! - lineStart + 1;
 
     // Find context.
-    int lineEnd = source.length;
-    for (int i = offset; i < source.length; i++) {
-      int char = source.codeUnitAt(i);
+    int lineEnd = source!.length;
+    for (int i = offset!; i < source!.length; i++) {
+      int char = source!.codeUnitAt(i);
       if (char == 0x0a || char == 0x0d) {
         lineEnd = i;
         break;
@@ -87,22 +87,22 @@ class TemplateException implements m.TemplateException {
     if (length > 78) {
       // Can't show entire line. Try to anchor at the nearest end, if
       // one is within reach.
-      int index = offset - lineStart;
+      int index = offset! - lineStart;
       if (index < 75) {
         end = start + 75;
         postfix = "...";
-      } else if (end - offset < 75) {
+      } else if (end - offset! < 75) {
         start = end - 75;
         prefix = "...";
       } else {
         // Neither end is near, just pick an area around the offset.
-        start = offset - 36;
-        end = offset + 36;
+        start = offset! - 36;
+        end = offset! + 36;
         prefix = postfix = "...";
       }
     }
-    String slice = source.substring(start, end);
-    int markOffset = offset - start + prefix.length;
+    String slice = source!.substring(start, end);
+    int markOffset = offset! - start + prefix.length;
 
     _context = "$prefix$slice$postfix\n${" " * markOffset}^\n";
   }

@@ -48,7 +48,7 @@ class Renderer extends Visitor {
         ctx.source);
 
     Renderer.lambda(Renderer ctx, String source, String indent, StringSink sink,
-        String delimiters)
+        String? delimiters)
         : this(
         sink,
         ctx._stack,
@@ -62,35 +62,35 @@ class Renderer extends Visitor {
     final StringSink sink;
     final List _stack;
     final bool lenient;
-    final bool htmlEscapeValues;
-    final m.PartialResolver partialResolver;
-    final String templateName;
+    final bool? htmlEscapeValues;
+    final m.PartialResolver? partialResolver;
+    final String? templateName;
     final String indent;
     final String source;
 
     void push(value) => _stack.add(value);
 
-    Object pop() => _stack.removeLast();
+    Object? pop() => _stack.removeLast();
 
     write(Object output) => sink.write(output.toString());
 
-    void render(List<Node> nodes) {
+    void render(List<Node?> nodes) {
         if (indent == null || indent == '') {
-            nodes.forEach((n) => n.accept(this));
+            nodes.forEach((n) => n!.accept(this));
         }
         else if (nodes.isNotEmpty) {
             // Special case to make sure there is not an extra indent after the last
             // line in the partial file.
             write(indent);
 
-            nodes.take(nodes.length - 1).forEach((n) => n.accept(this));
+            nodes.take(nodes.length - 1).forEach((n) => n!.accept(this));
 
             var node = nodes.last;
             if (node is TextNode) {
                 visitText(node, lastNode: true);
             }
             else {
-                node.accept(this);
+                node!.accept(this);
             }
         }
     }
@@ -128,7 +128,7 @@ class Renderer extends Visitor {
         }
         else {
             var valueString = (value == null) ? '' : value.toString();
-            var output = !node.escape || !htmlEscapeValues
+            var output = !node.escape || !htmlEscapeValues!
                 ? valueString
                 : _htmlEscape(valueString);
             if (output != null) write(output);
@@ -235,8 +235,8 @@ class Renderer extends Visitor {
 
     void visitPartial(PartialNode node) {
         var partialName = node.name;
-        Template template =
-        partialResolver == null ? null : partialResolver(partialName);
+        Template? template =
+        partialResolver == null ? null : partialResolver!(partialName) as Template?;
         if (template != null) {
             var renderer = new Renderer.partial(this, template, node.indent);
             var nodes = getTemplateNodes(template);
@@ -252,12 +252,12 @@ class Renderer extends Visitor {
 
     // Walks up the stack looking for the variable.
     // Handles dotted names of the form "a.b.c".
-    Object resolveValue(String name) {
+    Object? resolveValue(String name) {
         if (name == '.') {
             return _stack.last;
         }
         var parts = name.split('.');
-        var object = noSuchProperty;
+        Object? object = noSuchProperty;
         for (var o in _stack.reversed) {
             object = _getNamedProperty(o, parts[0]);
             if (object != noSuchProperty) {
@@ -307,7 +307,7 @@ class Renderer extends Visitor {
             return noSuchProperty;
         }
 
-        var result = null;
+        dynamic result = null;
         try {
             final InstanceMirror instanceMirror = m.mustache.reflect(object);
 
@@ -315,7 +315,7 @@ class Renderer extends Visitor {
             if((instanceMirror.type.instanceMembers["key"]?.isGetter ?? false)
                 && (instanceMirror.type.instanceMembers["value"]?.isGetter ?? false)) {
 
-                final String key = instanceMirror.invokeGetter("key")?.toString();
+                final String? key = instanceMirror.invokeGetter("key")?.toString();
                 if(name == key) {
                     result = instanceMirror.invokeGetter("value");
                     return result;

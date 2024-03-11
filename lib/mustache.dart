@@ -29,12 +29,12 @@ abstract class Template {
   /// unless lenient mode is specified.
   factory Template(String source,
       {bool lenient,
-      bool htmlEscapeValues,
-      String name,
-      PartialResolver partialResolver,
-      String delimiters}) = t.Template.fromSource;
+      bool? htmlEscapeValues,
+      String? name,
+      PartialResolver? partialResolver,
+      String? delimiters}) = t.Template.fromSource;
 
-  String get name;
+  String? get name;
   String get source;
 
   /// [values] can be a combination of Map, List, String. Any non-String object
@@ -59,11 +59,11 @@ abstract class LambdaContext {
   /// Render the current section tag in the current context and return the
   /// result as a string. If provided, value will be added to the top of the
   /// context's stack.
-  String renderString({Object value});
+  String renderString({Object? value});
 
   /// Render and directly output the current section tag. If provided, value
   /// will be added to the top of the context's stack.
-  void render({Object value});
+  void render({Object? value});
 
   /// Output a string. The output will not be html escaped, and will be written
   /// before the output returned from the lambda.
@@ -74,10 +74,10 @@ abstract class LambdaContext {
 
   /// Evaluate the string as a mustache template using the current context. If
   /// provided, value will be added to the top of the context's stack.
-  String renderSource(String source, {Object value});
+  String renderSource(String source, {Object? value});
 
   /// Lookup the value of a variable in the current context.
-  Object lookup(String variableName);
+  Object? lookup(String variableName);
 }
 
 /// [TemplateException] is used to obtain the line and column numbers
@@ -88,23 +88,23 @@ abstract class TemplateException implements Exception {
 
   /// The name used to identify the template, as passed to the Template
   /// constructor.
-  String get templateName;
+  String? get templateName;
 
   /// The 1-based line number of the token where formatting error was found.
-  int get line;
+  int? get line;
 
   /// The 1-based column number of the token where formatting error was found.
-  int get column;
+  int? get column;
 
   /// The character offset within the template source.
-  int get offset;
+  int? get offset;
 
   /// The template source.
-  String get source;
+  String? get source;
 
   /// A short source substring of the source at the point the problem occurred
   /// with parsing or rendering.
-  String get context;
+  String? get context;
 
   String toString();
 }

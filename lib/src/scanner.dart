@@ -4,7 +4,7 @@ import 'token.dart';
 import 'template_exception.dart';
 
 class Scanner {
-  Scanner(String source, this._templateName, String delimiters,
+  Scanner(String source, this._templateName, String? delimiters,
       {bool lenient: true})
       : _source = source,
         _lenient = lenient,
@@ -33,7 +33,7 @@ class Scanner {
     }
   }
 
-  final String _templateName;
+  final String? _templateName;
   final String _source;
   final bool _lenient;
 
@@ -41,13 +41,13 @@ class Scanner {
   int _offset = 0;
   int _c = 0;
 
-  final List<Token> _tokens = new List<Token>();
+  final List<Token> _tokens = List<Token>.empty();
 
   // These can be changed by the change delimiter tag.
-  int _openDelimiter;
-  int _openDelimiterInner;
-  int _closeDelimiterInner;
-  int _closeDelimiter;
+  int? _openDelimiter;
+  int? _openDelimiterInner;
+  int? _closeDelimiterInner;
+  int? _closeDelimiter;
 
   List<Token> scan() {
     for (int c = _peek(); c != _EOF; c = _peek()) {
@@ -64,7 +64,7 @@ class Scanner {
 
       // If only a single delimiter character then create a text token.
       if (_openDelimiterInner != null && _peek() != _openDelimiterInner) {
-        var value = new String.fromCharCode(_openDelimiter);
+        var value = new String.fromCharCode(_openDelimiter!);
         _append(TokenType.text, value, start, _offset);
         continue;
       }
@@ -90,8 +90,8 @@ class Scanner {
         } else {
           // Scan standard mustache tag.
           var value = new String.fromCharCodes(_openDelimiterInner == null
-              ? [_openDelimiter]
-              : [_openDelimiter, _openDelimiterInner]);
+              ? [_openDelimiter!]
+              : [_openDelimiter!, _openDelimiterInner!]);
 
           _append(TokenType.openDelimiter, value, start, wsStart);
 
@@ -124,7 +124,7 @@ class Scanner {
     return _source.substring(start, end);
   }
 
-  _expect(int expectedCharCode) {
+  _expect(int? expectedCharCode) {
     int c = _read();
 
     if (c == _EOF) {
@@ -133,7 +133,7 @@ class Scanner {
     } else if (c != expectedCharCode) {
       throw new TemplateException(
           'Unexpected character, '
-          'expected: ${new String.fromCharCode(expectedCharCode)}, '
+          'expected: ${new String.fromCharCode(expectedCharCode!)}, '
           'was: ${new String.fromCharCode(c)}',
           _templateName,
           _source,
@@ -263,8 +263,8 @@ class Scanner {
       _expect(_closeDelimiter);
 
       String value = new String.fromCharCodes(_closeDelimiterInner == null
-          ? [_closeDelimiter]
-          : [_closeDelimiterInner, _closeDelimiter]);
+          ? [_closeDelimiter!]
+          : [_closeDelimiterInner!, _closeDelimiter!]);
 
       _append(TokenType.closeDelimiter, value, start, _offset);
     }
@@ -331,13 +331,13 @@ class Scanner {
 
     // Create delimiter string.
     var buffer = new StringBuffer();
-    buffer.writeCharCode(_openDelimiter);
-    if (_openDelimiterInner != null) buffer.writeCharCode(_openDelimiterInner);
+    buffer.writeCharCode(_openDelimiter!);
+    if (_openDelimiterInner != null) buffer.writeCharCode(_openDelimiterInner!);
     buffer.write(' ');
     if (_closeDelimiterInner != null) {
-      buffer.writeCharCode(_closeDelimiterInner);
+      buffer.writeCharCode(_closeDelimiterInner!);
     }
-    buffer.writeCharCode(_closeDelimiter);
+    buffer.writeCharCode(_closeDelimiter!);
     var value = buffer.toString();
 
     _append(TokenType.changeDelimiter, value, start, _offset);

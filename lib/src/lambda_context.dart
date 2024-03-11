@@ -32,7 +32,7 @@ class LambdaContext implements m.LambdaContext {
 
   /// Render the current section tag in the current context and return the
   /// result as a string.
-  String renderString({Object value}) {
+  String renderString({Object? value}) {
     _checkClosed();
     if (_node is! SectionNode) _error(
         'LambdaContext.renderString() can only be called on section tags.');
@@ -41,14 +41,14 @@ class LambdaContext implements m.LambdaContext {
     return sink.toString();
   }
 
-  void _renderSubtree(StringSink sink, Object value) {
+  void _renderSubtree(StringSink sink, Object? value) {
     var renderer = new Renderer.subtree(_renderer, sink);
-    SectionNode section = _node;
+    SectionNode section = _node as SectionNode;
     if (value != null) renderer.push(value);
     renderer.render(section.children);
   }
 
-  void render({Object value}) {
+  void render({Object? value}) {
     _checkClosed();
     if (_node is! SectionNode) _error(
         'LambdaContext.render() can only be called on section tags.');
@@ -66,7 +66,7 @@ class LambdaContext implements m.LambdaContext {
 
     if (_node is! SectionNode) return '';
 
-    SectionNode node = _node;
+    SectionNode node = _node as SectionNode;
 
     var nodes = node.children;
 
@@ -78,14 +78,14 @@ class LambdaContext implements m.LambdaContext {
   }
 
   /// Evaluate the string as a mustache template using the current context.
-  String renderSource(String source, {Object value}) {
+  String renderSource(String source, {Object? value}) {
     _checkClosed();
     var sink = new StringBuffer();
 
     // Lambdas used for sections should parse with the current delimiters.
-    var delimiters = '{{ }}';
+    String? delimiters = '{{ }}';
     if (_node is SectionNode) {
-      SectionNode node = _node;
+      SectionNode node = _node as SectionNode;
       delimiters = node.delimiters;
     }
 
@@ -102,7 +102,7 @@ class LambdaContext implements m.LambdaContext {
   }
 
   /// Lookup the value of a variable in the current context.
-  Object lookup(String variableName) {
+  Object? lookup(String variableName) {
     _checkClosed();
     return _renderer.resolveValue(variableName);
   }
